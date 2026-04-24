@@ -8,7 +8,7 @@ FINANZAS-SIG-UI-MC — Gestión financiera profesional para maperos SIG. Control
 
 Sistema financiero profesional para **cartógrafos SIG, topógrafos y maperos independientes**. Controla clientes, proyectos, pendientes de cobro, pagos a maperos y estadísticas en tiempo real. Todo funciona **100% offline** en tu navegador — tus datos viven en tu disco.
 
-![Esquema de trabajo para Maperos SIG](Esquema-Maperos.jpg)
+<img src="Esquema-Maperos.jpg" alt="Esquema de trabajo" width="400">
 
 ---
 
@@ -85,8 +85,9 @@ Si quieres que la app **auto-guarde** directamente sobre un archivo en tu comput
 #    https://tuusuario.github.io/FINANZAS-SIG-UI-MC/
 
 
-
-
+```
+<a href="https://nowpayments.io/donation?api_key=80eb3243-c6e1-419f-acc1-5d38513b794f" target="_blank" rel="noreferrer noopener">
+   <img src="https://nowpayments.io/images/embeds/donation-button-black.svg" alt="Crypto donation button by NOWPayments">
+</a>
 
 finanzas-sig, mapero, paraguay, gestion-financiera, cartografia, sig, gis, proyectos, cobros, backup-local, uphold, donaciones-crypto
-
