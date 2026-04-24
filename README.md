@@ -16,7 +16,7 @@ Sistema financiero profesional para **cartógrafos SIG, topógrafos y maperos in
 
 PROGRAMA HTML
 
-[![Descargar HTML](https://img.shields.io/badge/⬇️_Descargar_última_versión-blue?style=for-the-badge&logo=html5)](https://github.com/marc3ivan/FINANZAS-SIG-UI-MC/releases/download/v6.1/FSIG-UIMC.html)
+[![Descargar HTML](https://img.shields.io/badge/⬇️_Descargar_FINANZAS--SIG--UI--MC_6.1-0A66C2?style=for-the-badge&logo=html5&logoColor=white)](https://github.com/marc3ivan/FINANZAS-SIG-UI-MC/releases/download/html/FSIG-UIMC.html)
 
 ## 🚀 Características
 
