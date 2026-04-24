@@ -8,6 +8,8 @@ FINANZAS-SIG-UI-MC — Gestión financiera profesional para maperos SIG. Control
 
 Sistema financiero profesional para **cartógrafos SIG, topógrafos y maperos independientes**. Controla clientes, proyectos, pendientes de cobro, pagos a maperos y estadísticas en tiempo real. Todo funciona **100% offline** en tu navegador — tus datos viven en tu disco.
 
+![Esquema de trabajo para Maperos SIG](Esquema-Maperos.jpg)
+
 ---
 
 ## 🚀 Características
