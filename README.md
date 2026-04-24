@@ -93,6 +93,8 @@ Si quieres que la app **auto-guarde** directamente sobre un archivo en tu comput
 
 
 ```
+Si deseas donarme, puedes hacerlo a través de crypto! 🥇
+
 <a href="https://nowpayments.io/donation?api_key=80eb3243-c6e1-419f-acc1-5d38513b794f" target="_blank" rel="noreferrer noopener">
    <img src="https://nowpayments.io/images/embeds/donation-button-black.svg" alt="Crypto donation button by NOWPayments">
 </a>
