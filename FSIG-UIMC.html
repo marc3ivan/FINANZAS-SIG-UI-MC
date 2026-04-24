@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cartografía PRO — v6.0 (Pagos Parciales)</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #111214; --bg2: #18191d; --bg3: #1e2024; --bg4: #25272d;
+  --border: #2e3038; --border2: #3a3d47; --text: #e8e9ec; --text2: #9a9da8;
+  --text3: #5c5f6b; --accent: #4f8ef7; --accent2: #2563eb; --green: #34d399;
+  --green-bg: #0d2a1e; --amber: #fbbf24; --amber-bg: #2a1f06; --red: #f87171; 
+  --red-bg: #2a0d0d; --radius: 10px; --radius-lg: 14px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.5; }
+#app { max-width: 860px; margin: 0 auto; padding: 2rem 1.25rem; min-height: 100vh; display: flex; flex-direction: column; }
+
+.top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+#sys-clock { font-family: 'DM Mono'; font-size: 11px; color: var(--accent); font-weight: 500; }
+.lang-selector { display: flex; gap: 8px; }
+.lang-btn { background: var(--bg2); border: 1px solid var(--border); padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 18px; }
+
+.data-tools { background: var(--bg2); border: 1px solid var(--border); padding: 10px 15px; border-radius: var(--radius); display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; align-items: center; }
+.logo { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--text2); }
+
+.nav-scroll { display: flex; gap: 4px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 4px; overflow-x: auto; margin-bottom: 10px; }
+.nav-scroll button { background: none; border: none; color: var(--text2); font-size: 12px; padding: 8px 14px; border-radius: 7px; cursor: pointer; white-space: nowrap; font-weight: 500; }
+.nav-scroll button.active { background: var(--bg4); color: var(--text); }
+
+.filter-row { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; margin-bottom: 1.5rem; }
+input { background: var(--bg2); border: 1px solid var(--border); padding: 10px 12px; border-radius: var(--radius); color: white; outline: none; font-size: 13px; width: 100%; }
+
+.btn { background: var(--bg3); border: 1px solid var(--border); color: var(--text); padding: 8px 14px; border-radius: var(--radius); cursor: pointer; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; border: 1px solid transparent; }
+.btn.primary { background: var(--accent2); border-color: var(--accent); color: white; }
+.btn.green { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+.btn.red { background: var(--red-bg); border-color: var(--red); color: var(--red); }
+.btn.amber { background: var(--amber-bg); border-color: var(--amber); color: var(--amber); }
+.btn.sm { padding: 4px 8px; font-size: 11px; }
+
+.card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 15px; overflow: hidden; }
+.card-head { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+.avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; }
+
+.item-box { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; margin-bottom: 8px; border-left: 4px solid var(--border); position: relative; }
+.item-actions { display: flex; gap: 5px; margin-top: 8px; border-top: 1px solid var(--border); padding-top: 8px; flex-wrap: wrap; }
+
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+.widget { background: var(--bg2); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius-lg); text-align: center; }
+.widget-val { font-size: 24px; font-weight: 700; font-family: 'DM Mono'; color: var(--accent); margin: 10px 0; }
+.tag { font-size: 10px; padding: 2px 6px; border-radius: 4px; background: var(--bg4); color: var(--text2); }
+
+.modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(4px); }
+.modal { background: var(--bg2); padding: 1.5rem; border-radius: var(--radius-lg); width: 95%; max-width: 450px; border: 1px solid var(--border2); max-height: 90vh; overflow-y: auto; }
+.field { margin-bottom: 10px; }
+.field label { display: block; font-size: 11px; color: var(--text3); text-transform: uppercase; margin-bottom: 4px; font-weight: bold; }
+
+.pago-parcial { font-size: 10px; color: var(--amber); margin-top: 4px; }
+
+footer { margin-top: auto; padding: 2rem 0; border-top: 1px solid var(--border); text-align: center; opacity: 0.7; }
+.signature { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 2px; color: var(--text2); text-transform: uppercase; }
+.signature b { color: var(--accent); font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div class="top-bar">
+    <div style="display: flex; flex-direction: column; gap: 2px;">
+      <div id="sys-clock"></div>
+      <div style="font-family: 'DM Mono'; font-size: 9px; color: var(--text3);">SYS_BUILD: 6.1 // PAGOS PARCIALES</div>
+    </div>
+    <div class="lang-selector">
+      <button class="lang-btn" onclick="setLang('es')">🇵🇾</button>
+      <button class="lang-btn" onclick="setLang('en')">🇺🇸</button>
+      <button class="lang-btn" onclick="setLang('zh')">🇹🇼</button>
+    </div>
+  </div>
+
+  <div class="data-tools">
+    <div class="logo">FINANZAS SIG <span>//</span> UI</div>
+    <div style="flex:1"></div>
+    <a href="https://nowpayments.io/donation?api_key=80eb3243-c6e1-419f-acc1-5d38513b794f" target="_blank" rel="noreferrer noopener" style="text-decoration: none;">
+      <img src="https://nowpayments.io/images/embeds/donation-button-black.svg" alt="Donar con tarjeta" style="height: 28px;">
+    </a>
+    <button class="btn sm" onclick="vincularArchivo()">🔗 <span data-i18n="link">Vincular</span></button>
+    <button class="btn sm" onclick="exportarData()">💾 Backup</button>
+    <button class="btn sm" onclick="document.getElementById('importFile').click()">📂 <span data-i18n="import">Importar</span></button>
+    <input type="file" id="importFile" style="display:none" onchange="importarData(event)" accept=".json">
+  </div>
+
+  <div class="nav-container">
+    <div class="nav-scroll">
+      <button id="btn-clientes" class="active" onclick="showTab('clientes')" data-i18n="tab_main">Principal</button>
+      <button id="btn-pendientes" onclick="showTab('pendientes')" data-i18n="tab_pnd">Pendientes</button>
+      <button id="btn-stats" onclick="showTab('stats')" data-i18n="tab_stats">Estadísticas</button>
+    </div>
+    <div class="filter-row">
+      <input type="text" id="search" placeholder="..." oninput="render()">
+      <button class="btn primary" onclick="modalCliente()" data-i18n="btn_add_cli">+ Consultora</button>
+    </div>
+  </div>
+
+  <div id="content"></div>
+  <div id="modal-container"></div>
+
+  <footer>
+    <div class="signature">
+      DEVELOPED BY <b>MARCELO CABALLERO</b>
+      <div style="margin-top: 4px; font-size: 8px; opacity: 0.5;">ASUNCIÓN, PARAGUAY © 2026</div>
+    </div>
+  </footer>
+</div>
+
+<script>
+const i18n = {
+  es: { link: "Vincular", import: "Importar", tab_main: "Principal", tab_pnd: "Pendientes", tab_stats: "Estadísticas", btn_add_cli: "+ Consultora", search: "Buscar...", pnd: "Pendiente", al_dia: "Al día", ticket: "Resumen", add_job: "+ Trabajo", cobrado: "Cobrado", total_bruto: "Bruto Total", top_mapero: "Top Mapero", cobro_title: "Resumen de Cobro", ws: "WhatsApp", del: "Borrar", cost: "Costo x Lámina", edit: "Editar", pay_mapero: "Pago Mapero", pnd_maperos: "Deuda a Maperos", monto_pago: "Monto que pagó (Gs)", pagado_parcial: "Pagado parcial" },
+  en: { link: "Link", import: "Import", tab_main: "Home", tab_pnd: "Pending", tab_stats: "Stats", btn_add_cli: "+ Agency", search: "Search...", pnd: "Pending", al_dia: "Up to date", ticket: "Summary", add_job: "+ Job", cobrado: "Collected", total_bruto: "Gross Total", top_mapero: "Top Cartographer", cobro_title: "Payment Summary", ws: "WhatsApp", del: "Delete", cost: "Cost per Sheet", edit: "Edit", pay_mapero: "Staff Paid", pnd_maperos: "Staff Debt", monto_pago: "Amount paid (Gs)", pagado_parcial: "Partially paid" },
+  zh: { link: "連結文件", import: "導入", tab_main: "首頁", tab_pnd: "待處理", tab_stats: "統計數據", btn_add_cli: "+ 新顧問公司", search: "搜尋...", pnd: "待付款", al_dia: "已清帳", ticket: "明細", add_job: "+ 新工作", cobrado: "已收金額", total_bruto: "總毛利", top_mapero: "首選繪圖員", cobro_title: "收款摘要", ws: "通訊軟體", del: "刪除", cost: "每張圖紙成本", edit: "編輯", pay_mapero: "已付繪圖員", pnd_maperos: "應付繪圖員", monto_pago: "支付金額", pagado_parcial: "部分付款" }
+};
+
+let currentLang = localStorage.getItem('cartoLang') || 'es';
+let db = JSON.parse(localStorage.getItem('cartoDB_v6.1') || '{"clientes":[],"precioBase":150000, "colapsados":[]}');
+let fileHandle = null;
+let currentTab = 'clientes';
+
+function updateClock() {
+  const now = new Date();
+  document.getElementById('sys-clock').innerText = now.toLocaleString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+function setLang(l) {
+  currentLang = l; localStorage.setItem('cartoLang', l);
+  document.querySelectorAll('[data-i18n]').forEach(el => el.innerText = i18n[l][el.getAttribute('data-i18n')]);
+  render();
+}
+
+const fmtGs = (n) => Number(n).toLocaleString('es-PY') + ' Gs';
+const getColor = (str) => { let h = 0; for (let i = 0; i < str.length; i++) h = str.charCodeAt(i) + ((h << 5) - h); return `hsl(${Math.abs(h) % 360}, 60%, 45%)`; };
+
+const save = async () => {
+  localStorage.setItem('cartoDB_v6.1', JSON.stringify(db));
+  if (fileHandle) { try { const w = await fileHandle.createWritable(); await w.write(JSON.stringify(db, null, 2)); await w.close(); } catch (e) {} }
+};
+
+// Calcular total, pagado y pendiente de un proyecto
+function getProjectTotales(p) {
+  const total = (p.precioPorLamina || db.precioBase) * p.laminas;
+  const pagado = p.pagadoMonto || 0;
+  const pendiente = total - pagado;
+  return { total, pagado, pendiente, estaPagado: pendiente <= 0 };
+}
+
+function render() {
+  const container = document.getElementById('content');
+  const t = i18n[currentLang];
+  let html = '';
+
+  if (currentTab === 'stats') {
+    let cobradoTotal = 0, pendienteTotal = 0;
+    db.clientes.forEach(c => c.proyectos.forEach(p => {
+      const { total, pagado, pendiente } = getProjectTotales(p);
+      cobradoTotal += pagado;
+      pendienteTotal += pendiente;
+    }));
+    html = `<div class="stats-grid">
+      <div class="widget"><small>${t.total_bruto}</small><div class="widget-val">${fmtGs(cobradoTotal+pendienteTotal)}</div></div>
+      <div class="widget"><small>${t.pnd}</small><div class="widget-val" style="color:var(--amber)">${fmtGs(pendienteTotal > 0 ? pendienteTotal : 0)}</div></div>
+      <div class="widget"><small>${t.cobrado}</small><div class="widget-val" style="color:var(--green)">${fmtGs(cobradoTotal)}</div></div>
+    </div>`;
+  } else {
+    const query = document.getElementById('search').value.toLowerCase();
+    db.clientes.filter(c => c.nombre.toLowerCase().includes(query)).forEach(c => {
+      let proyectosFiltrados = currentTab === 'pendientes' 
+        ? c.proyectos.filter(p => getProjectTotales(p).pendiente > 0)
+        : c.proyectos;
+      
+      const deudaTotal = proyectosFiltrados.reduce((acc, p) => acc + getProjectTotales(p).pendiente, 0);
+      const ws = c.whatsapp ? `https://api.whatsapp.com/send?phone=595${c.whatsapp.replace(/^0/, '')}` : null;
+      if(currentTab === 'pendientes' && proyectosFiltrados.length === 0) return;
+
+      html += `
+      <div class="card">
+        <div class="card-head" onclick="toggleColapso('${c.id}')">
+          <div>
+            <div style="display:flex; align-items:center; gap:10px">
+              <div class="avatar" style="background:${getColor(c.nombre)}">${c.nombre.charAt(0)}</div>
+              <div><strong>${c.nombre}</strong><div style="font-size:11px; color:var(--amber)">${deudaTotal > 0 ? t.pnd + ': ' + fmtGs(deudaTotal) : t.al_dia}</div></div>
+            </div>
+            <div style="margin-top:5px" onclick="event.stopPropagation()">
+              ${ws ? `<a href="${ws}" target="_blank" class="btn sm green">📱 ${t.ws}</a>` : ''}
+              <button class="btn sm red" onclick="eliminarCliente('${c.id}')">🗑️</button>
+            </div>
+          </div>
+          <div onclick="event.stopPropagation()" style="display:flex; gap:5px">
+             <button class="btn sm" onclick="modalResumen('${c.id}')">${t.ticket}</button>
+             <button class="btn sm green" onclick="modalProyecto('${c.id}')">${t.add_job}</button>
+          </div>
+        </div>
+        <div style="padding:12px; display: ${(db.colapsados||[]).includes(c.id.toString()) ? 'none' : 'block'}">
+          ${proyectosFiltrados.map(p => {
+            const { total, pagado, pendiente, estaPagado } = getProjectTotales(p);
+            const pagadoPorcentaje = total > 0 ? (pagado / total) * 100 : 0;
+            return `
+            <div class="item-box" style="border-left-color: ${estaPagado ? 'var(--green)' : (pagado > 0 ? 'var(--amber)' : 'var(--border)')}">
+              <div style="display:flex; justify-content:space-between">
+                <div style="flex:1">
+                  <strong>${p.nombre}</strong> 
+                  ${p.mapero ? `<span class="tag" style="background:${getColor(p.mapero)}; color:white">${p.mapero}</span>` : ''}
+                  ${p.pagoMaperoRealizado ? `<span title="Pago a Mapero OK" style="color:var(--green); margin-left:5px">👤✓</span>` : ''}
+                  <br><small>${p.fechaRealizacion}</small>
+                  ${pagado > 0 && !estaPagado ? `<div class="pago-parcial">💰 ${t.pagado_parcial}: ${fmtGs(pagado)} (${Math.round(pagadoPorcentaje)}%)</div>` : ''}
+                </div>
+                <div style="text-align:right">
+                  <div class="monto"><strong>${fmtGs(total)}</strong></div>
+                  ${!estaPagado ? `<div style="font-size:11px; color:var(--amber)">Falta: ${fmtGs(pendiente)}</div>` : '<div style="font-size:11px; color:var(--green)">✓ Pagado</div>'}
+                  <div class="item-actions">
+                    <button class="btn sm" onclick="modalEditProyecto('${c.id}','${p.id}')">✏️</button>
+                    <button class="btn sm ${p.pagoMaperoRealizado?'green':'bg3'}" onclick="togglePagoMapero('${c.id}','${p.id}')">👤</button>
+                    ${!estaPagado ? `<button class="btn sm green" onclick="modalRegistrarPago('${c.id}','${p.id}', ${total}, ${pagado})">💰 Pagar</button>` : `<button class="btn sm red" onclick="desmarcarPago('${c.id}','${p.id}')">↩️</button>`}
+                  </div>
+                </div>
+              </div>
+            </div>
+          `}).join('')}
+        </div>
+      </div>`;
+    });
+    if (db.clientes.filter(c => c.nombre.toLowerCase().includes(query)).length === 0) {
+      html = '<div style="text-align:center; padding:40px; color:var(--text2);">No hay clientes o proyectos</div>';
+    }
+  }
+  container.innerHTML = html;
+}
+
+function modalRegistrarPago(cid, pid, total, pagadoActual) {
+  const pendiente = total - pagadoActual;
+  openM(`<h3>Registrar Pago</h3>
+    <div class="field"><label>Total del proyecto</label><div style="font-size:20px; font-weight:bold;">${fmtGs(total)}</div></div>
+    <div class="field"><label>Ya pagado</label><div style="color:var(--green);">${fmtGs(pagadoActual)}</div></div>
+    <div class="field"><label>Falta pagar</label><div style="color:var(--amber); font-weight:bold;">${fmtGs(pendiente)}</div></div>
+    <div class="field"><label>Monto que paga AHORA (Gs)</label><input type="number" id="monto-pago" value="${pendiente}" step="1000" max="${pendiente}"></div>
+    <button class="btn primary" style="width:100%; margin-top:15px" onclick="registrarPago('${cid}','${pid}', ${total})">Registrar Pago</button>`);
+}
+
+function registrarPago(cid, pid, total) {
+  const monto = parseInt(document.getElementById('monto-pago').value) || 0;
+  if (monto <= 0) { alert("Ingresá un monto válido"); return; }
+  const p = db.clientes.find(x=>x.id.toString()===cid.toString()).proyectos.find(x=>x.id.toString()===pid.toString());
+  const pagadoActual = p.pagadoMonto || 0;
+  const nuevoPagado = pagadoActual + monto;
+  if (nuevoPagado > total) {
+    alert(`El monto excede lo que falta pagar. Máximo: ${fmtGs(total - pagadoActual)}`);
+    return;
+  }
+  p.pagadoMonto = nuevoPagado;
+  if (nuevoPagado >= total) {
+    p.pagadoMonto = total;
+  }
+  p.fechaPago = new Date().toLocaleDateString();
+  save(); closeM(); render();
+}
+
+function desmarcarPago(cid, pid) {
+  if(confirm("¿Revertir TODO el cobro de este proyecto?")) { 
+    const p = db.clientes.find(x=>x.id.toString()===cid.toString()).proyectos.find(x=>x.id.toString()===pid.toString());
+    p.pagadoMonto = 0;
+    save(); render(); 
+  } 
+}
+
+function modalProyecto(cid) {
+  openM(`<h3>${i18n[currentLang].add_job}</h3>
+    <div class="field"><label>Proyecto</label><input type="text" id="m-p-n" autofocus></div>
+    <div class="field"><label>Mapero</label><input type="text" id="m-p-map"></div>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
+      <div class="field"><label>Láminas</label><input type="number" id="m-p-l" value="1"></div>
+      <div class="field"><label>Costo x lámina (Gs)</label><input type="number" id="m-p-price" value="${db.precioBase}"></div>
+    </div>
+    <button class="btn primary" style="width:100%" onclick="savePro('${cid}')">Crear</button>`);
+}
+
+function savePro(cid) {
+  const n=document.getElementById('m-p-n').value, m=document.getElementById('m-p-map').value, l=parseInt(document.getElementById('m-p-l').value), pr=parseInt(document.getElementById('m-p-price').value);
+  if(n){ 
+    db.clientes.find(x=>x.id.toString()===cid.toString()).proyectos.push({
+      id:Date.now(),
+      nombre:n,
+      mapero:m,
+      laminas:l,
+      precioPorLamina:pr,
+      pagadoMonto:0,
+      pagoMaperoRealizado:false,
+      fechaRealizacion:new Date().toLocaleDateString()
+    }); 
+    save();closeM();render();
+  }
+}
+
+function modalEditProyecto(cid, pid) {
+  const c = db.clientes.find(x=>x.id.toString()===cid.toString());
+  const p = c.proyectos.find(x=>x.id.toString()===pid.toString());
+  openM(`<h3>Editar Trabajo</h3>
+    <div class="field"><label>Nombre</label><input type="text" id="e-p-n" value="${p.nombre}"></div>
+    <div class="field"><label>Mapero</label><input type="text" id="e-p-map" value="${p.mapero||''}"></div>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
+      <div class="field"><label>Láminas</label><input type="number" id="e-p-l" value="${p.laminas}"></div>
+      <div class="field"><label>Costo x lámina</label><input type="number" id="e-p-price" value="${p.precioPorLamina || db.precioBase}"></div>
+    </div>
+    <button class="btn primary" style="width:100%" onclick="updatePro('${cid}','${pid}')">Guardar Cambios</button>`);
+}
+
+function updatePro(cid, pid) {
+  const c = db.clientes.find(x=>x.id.toString()===cid.toString());
+  const p = c.proyectos.find(x=>x.id.toString()===pid.toString());
+  p.nombre = document.getElementById('e-p-n').value;
+  p.mapero = document.getElementById('e-p-map').value;
+  p.laminas = parseInt(document.getElementById('e-p-l').value);
+  p.precioPorLamina = parseInt(document.getElementById('e-p-price').value);
+  save(); closeM(); render();
+}
+
+function togglePagoMapero(cid, pid) {
+  const p = db.clientes.find(x=>x.id.toString()===cid.toString()).proyectos.find(x=>x.id.toString()===pid.toString());
+  p.pagoMaperoRealizado = !p.pagoMaperoRealizado;
+  save(); render();
+}
+
+function toggleColapso(id){ if(!db.colapsados) db.colapsados=[]; let i=db.colapsados.indexOf(id.toString()); if(i>-1) db.colapsados.splice(i,1); else db.colapsados.push(id.toString()); save(); render(); }
+function openM(h) { document.getElementById('modal-container').innerHTML = `<div class="modal-bg" id="modal-bg" onclick="if(event.target.id==='modal-bg') closeM()"><div class="modal">${h}</div></div>`; }
+function closeM() { document.getElementById('modal-container').innerHTML = ''; }
+function showTab(t) { currentTab = t; document.querySelectorAll('.nav-scroll button').forEach(b => b.classList.toggle('active', b.id === 'btn-'+t)); render(); }
+function eliminarCliente(cid) { if(confirm("¿Eliminar?")) { db.clientes = db.clientes.filter(c => c.id.toString() !== cid.toString()); save(); render(); } }
+function modalCliente() { openM(`<h3>Nueva Consultora</h3><input type="text" id="m-cli-n" placeholder="Nombre"><input type="text" id="m-cli-w" placeholder="WhatsApp" style="margin-top:10px"><button class="btn primary" style="width:100%; margin-top:15px" onclick="saveCli()">Guardar</button>`); }
+function saveCli() { const n=document.getElementById('m-cli-n').value, w=document.getElementById('m-cli-w').value; if(n){db.clientes.push({id:Date.now(),nombre:n,whatsapp:w,proyectos:[]});save();closeM();render();}}
+async function vincularArchivo() { try { [fileHandle] = await window.showOpenFilePicker(); render(); } catch(e){} }
+function exportarData() { const b = new Blob([JSON.stringify(db)]); const a = document.createElement("a"); a.href=URL.createObjectURL(b); a.download="carto_v6.1.json"; a.click(); }
+function importarData(e) { const r = new FileReader(); r.onload=(ev)=>{db=JSON.parse(ev.target.result); save(); render();}; r.readAsText(e.target.files[0]); }
+function modalResumen(cid) {
+  const c = db.clientes.find(x => x.id.toString() === cid.toString());
+  const proysConDeuda = c.proyectos.filter(p => getProjectTotales(p).pendiente > 0);
+  const total = proysConDeuda.reduce((acc, p) => acc + getProjectTotales(p).pendiente, 0);
+  openM(`<h3>Resumen de Cobro</h3><p style="color:var(--accent)">${c.nombre}</p><div style="margin:15px 0; max-height:200px; overflow-y:auto">
+    ${proysConDeuda.map(p => `<div style="padding:8px 0; border-bottom:1px dashed var(--border)">${p.nombre} → Falta: ${fmtGs(getProjectTotales(p).pendiente)}</div>`).join('')}
+    </div><div style="font-size:20px; font-weight:bold; color:var(--green)">TOTAL PENDIENTE: ${fmtGs(total)}</div><button class="btn primary" style="width:100%; margin-top:15px" onclick="closeM()">Cerrar</button>`);
+}
+setLang(currentLang);
+</script>
+</body>
+</html>
